@@ -20,6 +20,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
+import 'package:yiot_portal/provision/yiot-provision.dart';
 import 'package:yiot_portal/components/yiot-countdown.dart';
 
 
@@ -34,7 +35,7 @@ class YiotProvisionBloc
 
 
   YiotProvisionBloc()
-      : super(YiotProvisionWaitDevice()) {
+      : super(YiotProvisionStopped()) {
 
     on<YiotProvisionStoppedEvent>((event, emit) {
       emit(YiotProvisionStopped());
@@ -63,10 +64,11 @@ class YiotProvisionBloc
 
   // ---------------------------------------------------------------------------
   //
-  //   Start Jenkins Service and communicate with it
+  //   Start Device Provision
   //
-//  void start(YIoTJenkinsStartModel model) {
-//    add(YiotJenkinsWaitActiveEvent());
+  void startProvision() {
+    add(YiotProvisionInProgressEvent());
+    YIoTProvision.start();
 //    YIoTJenkinsService.start(
 //            _yiotKeycloakService.token(), _yiotKeycloakService.currentUser(), model)
 //        .then((value) {
@@ -76,7 +78,7 @@ class YiotProvisionBloc
 //          }
 //          add(YiotJenkinsErrorEvent(err: value.err!));
 //    });
-//  }
+  }
 
   // ---------------------------------------------------------------------------
   //

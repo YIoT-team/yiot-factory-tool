@@ -17,48 +17,34 @@
 //    Lead Maintainer: Roman Kutashenko <kutashenko@gmail.com>
 //  ────────────────────────────────────────────────────────────
 
-import 'package:http/http.dart' as http;
+import 'dart:io';
 
-class YIoTRestHelpers {
+class YIoTProvision {
   // ---------------------------------------------------------------------------
   //
-  //  Fills required HTTP headers for request to YIoT backend
+  //  Start device provision
   //
-  static Map<String, String> headers(String token, String owner) {
-    Map<String, String> headers = {
-      'Content-type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-      'X-YIoT-Identity': owner,
-    };
+  static Future<bool> start() async {
+    Map<String, String> envVars = Platform.environment;
 
-    return headers;
-  }
-
-  // ---------------------------------------------------------------------------
-  //
-  //  Wait health endpoint
-  //
-  static Future<bool> waitActive(String healthUrl, String token, String owner, int reqDelay, int reqNum) async {
-
-    print(">>> healthUrl = " + healthUrl);
-    Uri url = Uri.parse(healthUrl);
-
-    var headers = YIoTRestHelpers.headers(token, owner);
-
-    for (var i = 0; i < reqNum; i++) {
-      // Request health endpoint
-      final response = await http.get(url, headers: headers);
-
-      // Check response code
-      print(response.statusCode);
-      if (response.statusCode == 200 || response.statusCode == 302) {
-        return true;
-      }
-
-      // Wait before the next check
-      await Future.delayed(Duration(seconds: reqDelay));
+    // Get home directory
+    String homeDir = "";
+    var h = envVars['HOME'];
+    if (h != null) {
+      homeDir = h!;
     }
+
+    // Get credentials directory
+    String credDir = homeDir;
+    var c = envVars['YIOT_CRED'];
+    if (c != null) {
+      credDir = c!;
+    }
+
+    // Run Provisioning process
+    final p = await Process.start('bash', ['-c', homeDir + '/start-yiot-factory-tool.sh ' + credDir]);
+    await stdout.addStream(p.stdout);
+    print('the end 😎');
 
     return false;
   }

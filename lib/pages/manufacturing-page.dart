@@ -21,8 +21,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yiot_portal/components/ui/yiot-title.dart';
+import 'package:yiot_portal/components/ui/yiot-primary-button.dart';
 import 'package:yiot_portal/bloc/yiot_provision_bloc.dart';
 import 'package:yiot_portal/components/ui/yiot-waiting-indicator.dart';
+import 'package:yiot_portal/components/ui/yiot-communicator.dart';
 
 // -----------------------------------------------------------------------------
 class ManufacturingPage extends StatefulWidget {
@@ -67,7 +69,12 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    Text('Device detection is stopped'),
+                    YIoTPrimaryButton(
+                      text: 'Start provision',
+                      onPressed: () {
+                        _bloc.startProvision();
+                      },
+                    ),
                   ],
                 ),
               );
@@ -101,8 +108,15 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
             //  Provision is in progress
             //
             if (state is YiotProvisionInProgress) {
-              return YIoTWaitingIndicator(
-                message: 'Provision is in progress ...',
+              return Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Text('Provision is in progress ...'),
+                    YIoTCommunicatorWidget(),
+                  ],
+                ),
               );
             }
 
