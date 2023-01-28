@@ -26,34 +26,38 @@ import 'package:yiot_portal/components/ui/yiot-secondary-button.dart';
 typedef OnReceived = void Function(String data);
 
 class YIoTCommunicatorWidget extends StatefulWidget {
-//  final textStream;
+ final textStream;
 
   const YIoTCommunicatorWidget(
-      {/*required this.textStream,*/ Key? key})
+      {required this.textStream, Key? key})
       : super(key: key);
 
   @override
   State<YIoTCommunicatorWidget> createState() => _YIoTCommunicatorWidgetState(
-//        textStream: textStream,
+       textStream: textStream,
       );
 }
 
 class _YIoTCommunicatorWidgetState extends State<YIoTCommunicatorWidget> {
   static const _space = 10.0;
-//  final textStream;
+  final textStream;
   late TextEditingController _controller;
+  ScrollController _scrollController = ScrollController();
 
-  _YIoTCommunicatorWidgetState(/*{required this.textStream}*/);
+  _YIoTCommunicatorWidgetState({required this.textStream});
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
-//    try {
-//      textStream.listen((event) {
-//        _controller.text += "\n" + event;
-//      });
-//    } catch (_) {}
+   try {
+     textStream.listen((data) {
+       _controller.text += "\n" + String.fromCharCodes(data);
+       Future.delayed(const Duration(milliseconds: 500), () {
+         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+       });
+     });
+   } catch (_) {}
   }
 
   @override
@@ -66,6 +70,7 @@ class _YIoTCommunicatorWidgetState extends State<YIoTCommunicatorWidget> {
           TextField(
             keyboardType: TextInputType.multiline,
             controller: _controller,
+            scrollController: _scrollController,
             readOnly: true,
             maxLines: 25,
             decoration: InputDecoration(

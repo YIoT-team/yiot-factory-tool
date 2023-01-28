@@ -62,8 +62,13 @@ class YiotProvisionDeviceDetectedEvent extends YiotProvisionEvent {
 
 // -----------------------------------------------------------------------------
 class YiotProvisionInProgressEvent extends YiotProvisionEvent {
+
+  late final Process p;
+
+  YiotProvisionInProgressEvent({required this.p});
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [p];
 
   @override
   String toString() => 'YIoT Provision in progress';

@@ -17,6 +17,8 @@
 //    Lead Maintainer: Roman Kutashenko <kutashenko@gmail.com>
 //  ────────────────────────────────────────────────────────────
 
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -50,7 +52,7 @@ class YiotProvisionBloc
     });
 
     on<YiotProvisionInProgressEvent>((event, emit) {
-      emit(YiotProvisionInProgress());
+      emit(YiotProvisionInProgress(p: event.p));
     });
 
     on<YiotProvisionDoneEvent>((event, emit) {
@@ -66,9 +68,9 @@ class YiotProvisionBloc
   //
   //   Start Device Provision
   //
-  void startProvision() {
-    add(YiotProvisionInProgressEvent());
-    YIoTProvision.start();
+  void startProvision() async {
+    var p = await YIoTProvision.start();
+    add(YiotProvisionInProgressEvent(p:p));
 //    YIoTJenkinsService.start(
 //            _yiotKeycloakService.token(), _yiotKeycloakService.currentUser(), model)
 //        .then((value) {

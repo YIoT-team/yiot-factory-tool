@@ -24,7 +24,7 @@ class YIoTProvision {
   //
   //  Start device provision
   //
-  static Future<bool> start() async {
+  static Future<Process> start() async {
     Map<String, String> envVars = Platform.environment;
 
     // Get home directory
@@ -35,18 +35,10 @@ class YIoTProvision {
     }
 
     // Get credentials directory
-    String credDir = homeDir;
-    var c = envVars['YIOT_CRED'];
-    if (c != null) {
-      credDir = c!;
-    }
+    var credDir = homeDir + '/credentials';
 
     // Run Provisioning process
-    final p = await Process.start('bash', ['-c', homeDir + '/start-yiot-factory-tool.sh ' + credDir]);
-    await stdout.addStream(p.stdout);
-    print('the end 😎');
-
-    return false;
+    return await Process.start('bash', ['-c', homeDir + '/start-yiot-factory-tool.sh ' + credDir]);
   }
 }
 

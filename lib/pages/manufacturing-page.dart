@@ -114,7 +114,7 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
                 child: Column(
                   children: [
                     Text('Provision is in progress ...'),
-                    YIoTCommunicatorWidget(),
+                    YIoTCommunicatorWidget(textStream: state.p.stdout),
                   ],
                 ),
               );
