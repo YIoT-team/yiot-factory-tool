@@ -17,8 +17,12 @@
 //    Lead Maintainer: Roman Kutashenko <kutashenko@gmail.com>
 //  ────────────────────────────────────────────────────────────
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yiot_portal/components/ui/yiot-title.dart';
+import 'package:yiot_portal/bloc/yiot_provision_bloc.dart';
+import 'package:yiot_portal/components/ui/yiot-waiting-indicator.dart';
 
 // -----------------------------------------------------------------------------
 class ManufacturingPage extends StatefulWidget {
@@ -30,10 +34,18 @@ class ManufacturingPage extends StatefulWidget {
 
 // -----------------------------------------------------------------------------
 class _ManufacturingPageState extends State<ManufacturingPage> {
+  late final YiotProvisionBloc _bloc;
+  bool _needInitialization = true;
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    if (_needInitialization) {
+      _bloc = Provider.of<YiotProvisionBloc>(context);
+//      _bloc.update();
+      _needInitialization = false;
+    }
 
+    return Column(children: [
       // -----------------------------------------------------------------------
       //  Title
       //
@@ -41,24 +53,77 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
       Divider(
         color: Colors.black,
       ),
-      SizedBox(
-        height: 20,
+      Container(
+        alignment: Alignment.topCenter,
+        child: BlocBuilder<YiotProvisionBloc, YiotProvisionState>(
+          builder: (context, state) {
+
+            //
+            //  Provision is stopped
+            //
+            if (state is YiotProvisionStopped) {
+              return Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Text('Device detection is stopped'),
+                  ],
+                ),
+              );
+            }
+
+            //
+            //  Devices wait
+            //
+            if (state is YiotProvisionWaitDevice) {
+              return YIoTWaitingIndicator(
+                message: 'Devices detection ...',
+              );
+            }
+
+            //
+            //  Device is detected
+            //
+            if (state is YiotProvisionDeviceDetected) {
+              return Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Text('Device detected ...'),
+                  ],
+                ),
+              );
+            }
+
+            //
+            //  Provision is in progress
+            //
+            if (state is YiotProvisionInProgress) {
+              return YIoTWaitingIndicator(
+                message: 'Provision is in progress ...',
+              );
+            }
+
+            //
+            //  Provision done
+            //
+            if (state is YiotProvisionDone) {
+              return Text('Provision done');
+            }
+
+            //
+            //  Provision error
+            //
+            if (state is YiotProvisionError) {
+              return Text('Provision error');
+            }
+
+            return Text('UNKNOWN STATE');
+          },
+        ),
       ),
-
-
-      // -----------------------------------------------------------------------
-      //  Version
-      //
-//      YIoTSettingsElement(
-//        name: 'Version',
-//        centered: true,
-//        body: YIoTLinkButton(
-//          text: '0.1.0.0',
-//          color: Colors.black,
-//        ),
-//        actions: <Widget>[
-//        ],
-//      ),
     ]);
   }
 }

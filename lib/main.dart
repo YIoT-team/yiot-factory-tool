@@ -17,6 +17,8 @@
 //    Lead Maintainer: Roman Kutashenko <kutashenko@gmail.com>
 //  ────────────────────────────────────────────────────────────
 
+import 'package:provider/provider.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:yiot_portal/routes/routes.dart';
@@ -26,6 +28,8 @@ import 'package:yiot_portal/pages/container/container-page.dart';
 
 import 'package:yiot_portal/pages/manufacturing-page.dart';
 import 'package:yiot_portal/pages/devices-page.dart';
+
+import 'package:yiot_portal/bloc/yiot_provision_bloc.dart';
 
 // -----------------------------------------------------------------------------
 void main() {
@@ -57,12 +61,20 @@ class _YIoTPortalState extends State<YIoTPortal> {
       routeData: "/devices",
       body: DevicesPage(),
     ));
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      // --- Providers ---
+      providers: [
+        Provider(
+          create: (context) {
+            return YiotProvisionBloc();
+          },
+        ),
+      ],
+      child: MaterialApp(
         onGenerateTitle: (BuildContext context) => "YIoT Factory",
         debugShowCheckedModeBanner: false,
 
@@ -71,6 +83,7 @@ class _YIoTPortalState extends State<YIoTPortal> {
 
         // --- Routes ---
         onGenerateRoute: _routes.generator,
+      ),
     );
   }
 }
