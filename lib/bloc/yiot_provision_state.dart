@@ -44,12 +44,12 @@ class YiotProvisionDeviceDetected extends YiotProvisionState {
 
 // -----------------------------------------------------------------------------
 class YiotProvisionInProgress extends YiotProvisionState {
-  late final Process p;
+  late final stream;
 
-  YiotProvisionInProgress({required this.p});
+  YiotProvisionInProgress({required this.stream});
 
   @override
-  List<Object> get props => [p];
+  List<Object> get props => [stream];
 }
 
 // -----------------------------------------------------------------------------

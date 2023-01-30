@@ -23,8 +23,6 @@ import 'package:yiot_portal/components/ui/yiot-secondary-button.dart';
 
 // -----------------------------------------------------------------------------
 
-typedef OnReceived = void Function(String data);
-
 class YIoTCommunicatorWidget extends StatefulWidget {
  final textStream;
 
