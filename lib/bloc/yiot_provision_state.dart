@@ -54,8 +54,13 @@ class YiotProvisionInProgress extends YiotProvisionState {
 
 // -----------------------------------------------------------------------------
 class YiotProvisionDone extends YiotProvisionState {
+
+  late final license;
+
+  YiotProvisionDone({required this.license});
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [license];
 }
 
 // -----------------------------------------------------------------------------

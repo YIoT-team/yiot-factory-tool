@@ -23,7 +23,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:yiot_portal/provision/yiot-provision.dart';
-import 'package:yiot_portal/components/yiot-countdown.dart';
 
 
 part 'yiot_provision_event.dart';
@@ -32,9 +31,6 @@ part 'yiot_provision_state.dart';
 // -----------------------------------------------------------------------------
 class YiotProvisionBloc
     extends Bloc<YiotProvisionEvent, YiotProvisionState> {
-//  static const _CHECK_PERIOD = 5000;
-//  static const _OPERATION_DEADLINE = 120000;
-
 
   YiotProvisionBloc()
       : super(YiotProvisionStopped()) {
@@ -56,7 +52,7 @@ class YiotProvisionBloc
     });
 
     on<YiotProvisionDoneEvent>((event, emit) {
-      emit(YiotProvisionDone());
+      emit(YiotProvisionDone(license: event.license));
     });
 
     on<YiotProvisionErrorEvent>((event, emit) {
@@ -71,9 +67,15 @@ class YiotProvisionBloc
   void startProvision() async {
     var p = await YIoTProvision.start();
     add(YiotProvisionInProgressEvent(stream: p.stdout));
-    p.exitCode.then((res) {
+    p.exitCode.then((res) async {
       if (res == 0) {
-        print(">>> DONE");
+        var license = await YIoTProvision.processArtifacts();
+        if (license.valid()) {
+          // TODO: Save to DB
+          add(YiotProvisionDoneEvent(license: license));
+        } else {
+          add(YiotProvisionErrorEvent());
+        }
       } else {
         add(YiotProvisionErrorEvent());
       }

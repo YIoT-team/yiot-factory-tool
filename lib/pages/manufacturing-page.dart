@@ -20,14 +20,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yiot_portal/model/yiot-device.dart';
 import 'package:yiot_portal/manual/yiot-manual.dart';
 import 'package:yiot_portal/components/ui/yiot-title.dart';
 import 'package:yiot_portal/components/ui/yiot-primary-button.dart';
 import 'package:yiot_portal/bloc/yiot_provision_bloc.dart';
 import 'package:yiot_portal/components/ui/yiot-waiting-indicator.dart';
 import 'package:yiot_portal/components/ui/yiot-communicator.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:yiot_portal/model/yiot-license.dart';
+import 'package:yiot_portal/model/yiot-manufacturing-info.dart';
 
 // -----------------------------------------------------------------------------
 class ManufacturingPage extends StatefulWidget {
@@ -46,7 +46,6 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
   Widget build(BuildContext context) {
     if (_needInitialization) {
       _bloc = Provider.of<YiotProvisionBloc>(context);
-//      _bloc.update();
       _needInitialization = false;
     }
 
@@ -75,19 +74,6 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
                       text: 'Start provision',
                       onPressed: () {
                         _bloc.startProvision();
-//                        YIoTManual.create(YIoTDevice(
-//                          manufacturer: "YIoT",
-//                          model: "CV-2SE",
-//                          serial: "0123456789",
-//                          macAddress: "01:02:03:04:05:06",
-//                          publicKey: "AAAAC3NzaC1lZDI1NTE5AAAAIFW5JvT1cYyiuT7+Q6ghCoCGLi5xcEVdBKUcfxy835bC",
-//                          icon: "assets/images/yiot.png",
-//                          docLink: "https://cdn.yiot.dev/docs/devices/cv-2se.pdf",
-//                          initialUser: "yiot",
-//                          initialPassword: "J!H@KLedds76%#57",
-//                          initialAddress: "192.168.1.1",
-//                          explain: "DO NOT FORGET TO CHANGE YOUR INITIAL PASSWORDS",
-//                        ));
                       },
                     ),
                   ],
@@ -139,7 +125,23 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
             //  Provision done
             //
             if (state is YiotProvisionDone) {
-              return Text('Provision done');
+              return AlertDialog(
+                title: const Text('Device provision successful'),
+                content: const Text('Would you like to print device manual ?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => _bloc.cancel(),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      this._printManual(state.license);
+                      _bloc.cancel();
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
+              );
             }
 
             //
@@ -167,6 +169,15 @@ class _ManufacturingPageState extends State<ManufacturingPage> {
         ),
       ),
     ]);
+  }
+
+  void _printManual(YIoTLicense lic) {
+    YIoTManual.create(YIoTManufacturingInfo(
+      license: lic,
+      icon: "assets/images/yiot.png",
+      docLink: "https://cdn.yiot.dev/docs/devices/cv-2se.pdf",
+      explain: "DO NOT FORGET TO CHANGE YOUR INITIAL PASSWORDS",
+    ));
   }
 }
 

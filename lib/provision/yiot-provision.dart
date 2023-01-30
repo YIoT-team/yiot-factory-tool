@@ -21,6 +21,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:yiot_portal/model/yiot-device.dart';
 import 'package:yiot_portal/model/yiot-license.dart';
+import 'package:random_password_generator/random_password_generator.dart';
 
 class YIoTProvision {
   // ---------------------------------------------------------------------------
@@ -47,7 +48,8 @@ class YIoTProvision {
   //  Start device provision
   //
   static Future<Process> start() async {
-    return await Process.start('bash', ['-c', _baseDir() + '/start-yiot-factory-tool.sh']);
+    return await Process.start(
+        'bash', ['-c', _baseDir() + '/start-yiot-factory-tool.sh']);
   }
 
   // ---------------------------------------------------------------------------
@@ -64,7 +66,8 @@ class YIoTProvision {
       final file = await artifacts;
 
       // Read the file
-      str = await file.readAsString();
+      var list = await file.readAsLines();
+      str = list.last;
     } catch (e) {
       return res;
     }
@@ -74,17 +77,33 @@ class YIoTProvision {
     String jsonText = stringToBase64.decode(str);
 
     // Parse license JSON
-    var json;
-    try {
-      json = json.decode(jsonText);
-    } catch (e) {
-      return res;
-    }
+    var j = json.decode(jsonText);
 
     // Get license data
+    String l = stringToBase64.decode(j['license']);
+    var licJson = json.decode(l);
+    var dataJson = licJson['device'];
 
+    // Parse device info
+    var serial = stringToBase64.decode(dataJson['serial']);
+    var deviceInfo = YIoTDevice(
+        manufacturer: dataJson['manufacturer'],
+        model: 'CV-2SE',//dataJson['model'],
+        serial: serial,
+        macAddress: dataJson['mac'],
+        publicKey: dataJson['publicKeyTiny'],
+        initialUser: 'yiot',
+        initialPassword: RandomPasswordGenerator().randomPassword(
+            numbers: true,
+            specialChar: true,
+            uppercase: true,
+            passwordLength: 10),
+        initialAddress: '192.168.1.1');
 
-    return str;
+    // Parse license
+    var license = YIoTLicense(full: str, deviceInfo: deviceInfo);
+
+    return license;
   }
 }
 

@@ -77,8 +77,13 @@ class YiotProvisionInProgressEvent extends YiotProvisionEvent {
 // -----------------------------------------------------------------------------
 class YiotProvisionDoneEvent
     extends YiotProvisionEvent {
+
+  late final license;
+
+  YiotProvisionDoneEvent({required this.license});
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [license];
 
   @override
   String toString() => 'YIoT Provision done';
