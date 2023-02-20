@@ -52,7 +52,10 @@ class _YIoTCommunicatorWidgetState extends State<YIoTCommunicatorWidget> {
      textStream.listen((data) {
        _controller.text += "\n" + String.fromCharCodes(data);
        Future.delayed(const Duration(milliseconds: 500), () {
+         try {
          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+         } catch(e) {
+         }
        });
      });
    } catch (_) {}

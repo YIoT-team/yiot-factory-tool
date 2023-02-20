@@ -197,7 +197,7 @@ class YIoTManual {
       ),
     );
 
-    final file = File('/Users/kutashenko/Work/yiot/example.pdf');
+    final file = File('/home/factory/manuals/${data.license.deviceInfo.macAddress.replaceAll(":", "_")}.pdf');
     await file.writeAsBytes(await pdf.save());
   }
 }
